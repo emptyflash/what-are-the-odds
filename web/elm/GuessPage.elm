@@ -116,7 +116,17 @@ inputGuess model =
                 ++ toString model.odds
                 ++ ":"
             )
-        , input [ onInput ChangeGuess, type_ "number" ] []
+        , input
+            [ onInput ChangeGuess
+            , type_ "number"
+            , Html.Attributes.max
+                (model.guess
+                    |> Maybe.map toString
+                    |> Maybe.withDefault ""
+                )
+            , Html.Attributes.min "1"
+            ]
+            []
         , button [ type_ "submit" ] [ text "Submit" ]
         ]
 

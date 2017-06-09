@@ -203,6 +203,7 @@ view model =
                     [ onInput UpdateOdds
                     , type_ "number"
                     , placeholder "one in ..."
+                    , Html.Attributes.min "2"
                     ]
                     []
                 , button [ type_ "submit" ] [ text "Submit" ]
