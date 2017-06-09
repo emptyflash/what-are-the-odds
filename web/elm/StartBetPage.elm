@@ -7,10 +7,11 @@ import Json.Decode as Decoder
 import Json.Encode as Encoder
 import Html exposing (..)
 import Html.Attributes exposing (placeholder, type_)
-import Html.Events exposing (onClick, onInput)
+import Html.Events exposing (onSubmit, onInput)
 import Phoenix.Socket as Socket exposing (Socket)
 import Phoenix.Channel as Channel
 import Phoenix.Push as Push
+import Hashids
 
 
 type alias Model =
@@ -55,11 +56,11 @@ isVowel char =
 
 uniqueToken : String -> String
 uniqueToken text =
-    text
-        |> String.filter isVowel
-        |> String.toList
-        |> List.take 6
-        |> String.fromList
+    (text
+        |> Hashids.hashidsSimple
+        |> Hashids.encode
+    )
+        9001
 
 
 payload : Model -> Encoder.Value
@@ -153,7 +154,7 @@ subscriptions model =
 view : Model -> Html Msg
 view model =
     if not model.submitted then
-        div []
+        form [ onSubmit SubmitBet ]
             [ textarea
                 [ placeholder "What are the odds that..."
                 , onInput ChangeBetText
@@ -165,7 +166,7 @@ view model =
                 , placeholder "Your name"
                 ]
                 []
-            , button [ onClick SubmitBet ] [ text "Submit" ]
+            , button [ type_ "submit" ] [ text "Submit" ]
             ]
     else
         div []

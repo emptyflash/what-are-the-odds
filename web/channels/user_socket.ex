@@ -20,12 +20,7 @@ defmodule ElmPhoenixChat.UserSocket do
   # See `Phoenix.Token` documentation for examples in
   # performing token verification on connect.
   def connect(_params, socket) do
-    length = 6
-    user = :crypto.strong_rand_bytes(length) 
-            |> Base.url_encode64 
-            |> binary_part(0, length)
-    new_socket = assign(socket, :user, user)
-    {:ok, new_socket}
+    {:ok, socket}
   end
 
   # Socket id's are topics that allow you to identify all sockets for a given user:

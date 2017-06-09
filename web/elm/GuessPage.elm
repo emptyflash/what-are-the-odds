@@ -3,7 +3,7 @@ module GuessPage exposing (..)
 import StartBetPage
 import Html exposing (..)
 import Html.Attributes exposing (type_)
-import Html.Events exposing (onInput, onClick)
+import Html.Events exposing (onInput, onSubmit)
 import Routing exposing (Route)
 import Phoenix.Socket as Socket exposing (Socket)
 import Json.Decode as Decoder
@@ -110,14 +110,14 @@ update msg model =
 
 inputGuess : Model -> Html Msg
 inputGuess model =
-    div []
+    form [ onSubmit SubmitGuess ]
         [ text
             ("Input a number between 1 and "
                 ++ toString model.odds
                 ++ ":"
             )
         , input [ onInput ChangeGuess, type_ "number" ] []
-        , button [ onClick SubmitGuess ] [ text "Submit" ]
+        , button [ type_ "submit" ] [ text "Submit" ]
         ]
 
 

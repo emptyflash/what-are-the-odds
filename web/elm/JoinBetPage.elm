@@ -4,7 +4,7 @@ import Constants
 import Routing exposing (Route(JoinBet))
 import Html exposing (..)
 import Html.Attributes exposing (type_, placeholder)
-import Html.Events exposing (onClick, onInput)
+import Html.Events exposing (onSubmit, onInput)
 import Phoenix.Socket as Socket exposing (Socket)
 import Phoenix.Channel as Channel
 import Phoenix.Push as Push
@@ -169,7 +169,7 @@ update msg model =
                 )
 
         GoToGuessPage ->
-            Debug.log "go" Maybe.withDefault "" model.code
+            Maybe.withDefault "" model.code
                 |> channelName
                 |> Routing.Guess model.odds model.socket
                 |> Task.succeed
@@ -192,7 +192,7 @@ view : Model -> Html Msg
 view model =
     case model.joinResponse of
         Just joinResponse ->
-            div []
+            form [ onSubmit SubmitOdds ]
                 [ text
                     (joinResponse.name
                         ++ " asked: what are the odds that "
@@ -205,12 +205,12 @@ view model =
                     , placeholder "one in ..."
                     ]
                     []
-                , button [ onClick SubmitOdds ] [ text "Submit" ]
+                , button [ type_ "submit" ] [ text "Submit" ]
                 ]
 
         Nothing ->
-            div []
+            form [ onSubmit JoinChannel ]
                 [ text "Please input the code from your friend:"
                 , input [ onInput UpdateCode ] []
-                , button [ onClick JoinChannel ] [ text "Submit" ]
+                , button [ type_ "submit" ] [ text "Submit" ]
                 ]
