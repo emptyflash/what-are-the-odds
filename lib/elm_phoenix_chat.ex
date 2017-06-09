@@ -1,5 +1,6 @@
 defmodule ElmPhoenixChat do
   use Application
+  require Registry
 
   # See http://elixir-lang.org/docs/stable/elixir/Application.html
   # for more information on OTP Applications
@@ -12,6 +13,7 @@ defmodule ElmPhoenixChat do
       supervisor(ElmPhoenixChat.Endpoint, []),
       # Start your own worker by calling: ElmPhoenixChat.Worker.start_link(arg1, arg2, arg3)
       # worker(ElmPhoenixChat.Worker, [arg1, arg2, arg3]),
+      supervisor(Registry, [:unique, Registry.BetState])
     ]
 
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html

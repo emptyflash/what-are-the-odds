@@ -2,8 +2,7 @@ defmodule ElmPhoenixChat.UserSocket do
   use Phoenix.Socket
 
   ## Channels
-  channel "room:*", ElmPhoenixChat.RoomChannel
-  channel "new:msg", ElmPhoenixChat.RoomChannel
+  channel "bet:join:*", ElmPhoenixChat.RoomChannel
 
   ## Transports
   transport :websocket, Phoenix.Transports.WebSocket
@@ -21,7 +20,12 @@ defmodule ElmPhoenixChat.UserSocket do
   # See `Phoenix.Token` documentation for examples in
   # performing token verification on connect.
   def connect(_params, socket) do
-    {:ok, socket}
+    length = 6
+    user = :crypto.strong_rand_bytes(length) 
+            |> Base.url_encode64 
+            |> binary_part(0, length)
+    new_socket = assign(socket, :user, user)
+    {:ok, new_socket}
   end
 
   # Socket id's are topics that allow you to identify all sockets for a given user:

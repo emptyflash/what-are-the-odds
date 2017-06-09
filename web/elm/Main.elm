@@ -1,220 +1,224 @@
 module Main exposing (..)
 
-import Dict
-
-import Html exposing (..)
-import Html.Events exposing (onClick, onInput, onSubmit)
-import Html.Attributes exposing (value, type_, placeholder)
-
+import StartPage
+import StartBetPage
+import JoinBetPage
+import GuessPage
+import Routing exposing (parseLocation, Route(..))
+import Navigation exposing (Location)
+import Html exposing (Html, text)
 import Json.Encode as Encoder
 import Json.Decode as Decoder exposing (Decoder, field)
+import Task
 
-import Phoenix.Socket as Socket exposing (Socket)
-import Phoenix.Channel as Channel exposing (Channel)
-import Phoenix.Push as Push
-
-import Markdown
 
 main : Program Never Model Msg
 main =
-    Html.program
+    Navigation.program LocationChange
         { init = init
         , update = update
         , view = view
         , subscriptions = subscriptions
         }
 
+
+type Msg
+    = LocationChange Location
+    | PageMsg PageMsg
+
+
+type PageMsg
+    = StartMsg StartPage.Msg
+    | StartBetMsg StartBetPage.Msg
+    | JoinBetMsg JoinBetPage.Msg
+    | GuessMsg GuessPage.Msg
+
+
+type PageModel
+    = StartModel StartPage.Model
+    | StartBetModel StartBetPage.Model
+    | JoinBetModel JoinBetPage.Model
+    | GuessModel GuessPage.Model
+    | Empty
+
+
 type alias Model =
-    { socket: Socket Msg
-    , newMessage : String
-    , messages : List ChatMessage
-    , user: String
-    , joined: Bool
+    { route : Route PageMsg
+    , pageModel : PageModel
     }
 
-type alias ChatMessage = 
-    { user : String
-    , body : String
-    }
-
-type Msg 
-    = SendMessage
-    | SetNewMessage String
-    | SetUsername String
-    | PhoenixMsg (Socket.Msg Msg)
-    | ReceiveChatMessage Encoder.Value
-    | JoinChannel
-    | LeaveChannel
-    | ShowJoinedMessage String
-    | ShowLeftMessage String
-    | NoOp
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Socket.listen model.socket PhoenixMsg
+    case model.pageModel of
+        StartBetModel startBetModel ->
+            StartBetPage.subscriptions startBetModel
+                |> Sub.map (PageMsg << StartBetMsg)
 
-websocketUrl : String
-websocketUrl =
-    "ws://b115756c.ngrok.io/socket/websocket"
+        JoinBetModel joinBetModel ->
+            JoinBetPage.subscriptions joinBetModel
+                |> Sub.map (PageMsg << JoinBetMsg)
 
-initSocket : Socket Msg
-initSocket =
-    Socket.init websocketUrl
-        |> Socket.withDebug
-        |> Socket.on "new:msg" "room:lobby" ReceiveChatMessage
+        GuessModel guessModel ->
+            GuessPage.subscriptions guessModel
+                |> Sub.map (PageMsg << GuessMsg)
 
-initModel : Model
-initModel =
-    { socket = initSocket
-    , newMessage = ""
-    , messages = []
-    , user = ""
-    , joined = False
-    }
+        _ ->
+            Sub.none
 
-init : (Model, Cmd Msg)
-init =
-    (initModel, Cmd.none)
 
-chatMessageDecoder : Decoder ChatMessage
-chatMessageDecoder =
-    Decoder.map2 ChatMessage
-      (field "user" Decoder.string)
-      (field "body" Decoder.string)
+init : Location -> ( Model, Cmd Msg )
+init location =
+    let
+        route =
+            parseLocation location
 
-userParams : Encoder.Value
-userParams =
-    Encoder.object [ ("user_id", Encoder.string "123" ) ]
+        model =
+            { route = route
+            , pageModel = Empty
+            }
+    in
+        updateRoute model route
 
-update : Msg -> Model -> (Model, Cmd Msg)
+
+defaultInit : Route msg -> ( PageModel, Cmd PageMsg )
+defaultInit route =
+    route
+        |> StartPage.init
+        |> Tuple.mapFirst StartModel
+        |> Tuple.mapSecond (Cmd.map StartMsg)
+
+
+updateRoute : Model -> Route PageMsg -> ( Model, Cmd Msg )
+updateRoute model route =
+    let
+        ( pageModel, pageCmd ) =
+            case route of
+                StartBet ->
+                    route
+                        |> StartBetPage.init
+                        |> Tuple.mapFirst StartBetModel
+                        |> Tuple.mapSecond (Cmd.map StartBetMsg)
+
+                JoinBet _ ->
+                    route
+                        |> JoinBetPage.init
+                        |> Tuple.mapFirst JoinBetModel
+                        |> Tuple.mapSecond (Cmd.map JoinBetMsg)
+
+                Guess _ _ _ ->
+                    route
+                        |> GuessPage.init
+                        |> Tuple.mapFirst GuessModel
+                        |> Tuple.mapSecond (Cmd.map GuessMsg)
+
+                _ ->
+                    defaultInit route
+    in
+        { model
+            | route = route
+            , pageModel = pageModel
+        }
+            ! [ Cmd.map PageMsg pageCmd ]
+
+
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        PhoenixMsg msg ->
+        LocationChange location ->
+            location
+                |> parseLocation
+                |> updateRoute model
+
+        PageMsg pageMsg ->
+            case pageMsg of
+                StartBetMsg (StartBetPage.ChangeRoute route) ->
+                    route
+                        |> Routing.mapRoute StartBetMsg
+                        |> updateRoute model
+
+                JoinBetMsg (JoinBetPage.ChangeRoute route) ->
+                    route
+                        |> Routing.mapRoute JoinBetMsg
+                        |> updateRoute model
+
+                _ ->
+                    updatePage pageMsg model
+                        |> Tuple.mapSecond (Cmd.map PageMsg)
+
+
+updatePage : PageMsg -> Model -> ( Model, Cmd PageMsg )
+updatePage pageMsg model =
+    case ( pageMsg, model.pageModel ) of
+        ( StartMsg msg, StartModel pageModel ) ->
             let
-                ( socket, cmd ) = Socket.update msg model.socket
+                ( newModel, cmd ) =
+                    StartPage.update msg pageModel
             in
-                ( { model | socket = socket }, Cmd.map PhoenixMsg cmd )
+                ( { model | pageModel = StartModel newModel }
+                , Cmd.map StartMsg cmd
+                )
 
-        SendMessage ->
+        ( StartBetMsg msg, StartBetModel pageModel ) ->
             let
-                payload = 
-                    Encoder.object
-                        [ ( "user"
-                          , Encoder.string model.user
-                          )
-                        , ( "body", Encoder.string model.newMessage )
-                        ]
-                push =
-                    Push.init "new:msg" "room:lobby"
-                        |> Push.withPayload payload
-
-                ( newSocket, cmd ) =
-                    Socket.push push model.socket
+                ( newModel, cmd ) =
+                    StartBetPage.update msg pageModel
             in
                 ( { model
-                  | newMessage = ""
-                  , socket = newSocket
+                    | pageModel = StartBetModel newModel
                   }
-                , Cmd.map PhoenixMsg cmd
+                , Cmd.map StartBetMsg cmd
                 )
 
-        SetNewMessage message ->
-            ( { model | newMessage = message }, Cmd.none )
-
-        SetUsername username ->
-            ( { model | user = username }, Cmd.none )
-        
-        ReceiveChatMessage json ->
-            case Decoder.decodeValue chatMessageDecoder json of
-                Ok chatMessage ->
-                    ( { model 
-                      | messages = chatMessage :: model.messages 
-                      }
-                    , Cmd.none )
-                Err error ->
-                    ( model, Cmd.none )
-
-        JoinChannel ->
+        ( JoinBetMsg msg, JoinBetModel pageModel ) ->
             let
-                channel =
-                    Channel.init "room:lobby"
-                        |> Channel.withPayload userParams
-                        |> Channel.onJoin (always <| ShowJoinedMessage "room:lobby")
-                        |> Channel.onClose (always <| ShowLeftMessage "room:lobby")
-                ( newSocket, cmd ) =
-                    Socket.join channel model.socket
+                ( newModel, cmd ) =
+                    JoinBetPage.update msg pageModel
             in
-                ( { model | socket = newSocket, joined = True}
-                , Cmd.map PhoenixMsg cmd
+                ( { model
+                    | pageModel = JoinBetModel newModel
+                  }
+                , Cmd.map JoinBetMsg cmd
                 )
 
-        LeaveChannel ->
+        ( GuessMsg msg, GuessModel pageModel ) ->
             let
-                ( newSocket, cmd ) =
-                    Socket.leave "room:lobby" model.socket
+                ( newModel, cmd ) =
+                    GuessPage.update msg pageModel
             in
-                ( { model | socket = newSocket, joined = False}
-                , Cmd.map PhoenixMsg cmd
+                ( { model
+                    | pageModel = GuessModel newModel
+                  }
+                , Cmd.map GuessMsg cmd
                 )
 
-        ShowJoinedMessage channelName ->
-            let 
-                joinedMessage = 
-                    ChatMessage "" <| "Joined " ++ channelName 
-            in
-                ( { model | messages = joinedMessage :: model.messages }
-                , Cmd.none
-                )
-
-        ShowLeftMessage channelName ->
-            let
-                leftMessage =
-                    ChatMessage "" <| "Left " ++ channelName
-            in
-                ( { model | messages = leftMessage :: model.messages }
-                , Cmd.none
-                )
-
-        NoOp -> 
+        msgAndModel ->
             ( model, Cmd.none )
+                |> Debug.log ("unexpected combo: " ++ toString msgAndModel)
+
 
 view : Model -> Html Msg
 view model =
-    div []
-        [ h3 [] [ text "Messages: " ]
-        , ul [] <| List.reverse <| List.map viewMessage model.messages
-        , if model.joined then
-              newMessageForm model
-          else
-              joinForm model
-        ]
+    case ( model.route, model.pageModel ) of
+        ( StartPage, StartModel pageModel ) ->
+            StartPage.view pageModel
+                |> Html.map (PageMsg << StartMsg)
 
-joinForm : Model -> Html Msg
-joinForm model =
-    form [ onSubmit JoinChannel ]
-        [ input 
-            [ type_ "text"
-            , value model.user
-            , onInput SetUsername
-            , placeholder "username"
-            ]
-            []
-        , button [ type_ "submit" ] [ text "Join" ]
-        ]
+        ( StartBet, StartBetModel pageModel ) ->
+            StartBetPage.view pageModel
+                |> Html.map (PageMsg << StartBetMsg)
 
-newMessageForm : Model -> Html Msg
-newMessageForm model =
-    form [ onSubmit SendMessage ]
-        [ input 
-            [ type_ "text"
-            , value model.newMessage
-            , onInput SetNewMessage
-            ]
-            []
-        , button [ type_ "submit" ] [ text "Send" ]
-        , button [ type_ "button", onClick LeaveChannel ] [ text "Leave" ]
-        ]
+        ( JoinBet _, JoinBetModel pageModel ) ->
+            JoinBetPage.view pageModel
+                |> Html.map (PageMsg << JoinBetMsg)
 
-viewMessage : ChatMessage -> Html Msg
-viewMessage message =
-    li [] [ span [] [ text message.user, text ": ", Markdown.toHtml [] message.body ] ]
+        ( Guess _ _ _, GuessModel pageModel ) ->
+            GuessPage.view pageModel
+                |> Html.map (PageMsg << GuessMsg)
+
+        a ->
+            let
+                a_ =
+                    Debug.log "test" a
+            in
+                text "not found"
