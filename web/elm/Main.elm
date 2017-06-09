@@ -6,10 +6,12 @@ import JoinBetPage
 import GuessPage
 import Routing exposing (parseLocation, Route(..))
 import Navigation exposing (Location)
-import Html exposing (Html, text)
+import Html exposing (Html, text, h1)
 import Json.Encode as Encoder
 import Json.Decode as Decoder exposing (Decoder, field)
 import Task
+import Bootstrap.CDN as CDN
+import Bootstrap.Grid as Grid
 
 
 main : Program Never Model Msg
@@ -199,6 +201,15 @@ updatePage pageMsg model =
 
 view : Model -> Html Msg
 view model =
+    Grid.container []
+        [ CDN.stylesheet
+        , h1 [] [ text "What Are the Odds?" ]
+        , viewPage model
+        ]
+
+
+viewPage : Model -> Html Msg
+viewPage model =
     case ( model.route, model.pageModel ) of
         ( StartPage, StartModel pageModel ) ->
             StartPage.view pageModel

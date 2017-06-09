@@ -12,6 +12,13 @@ import Phoenix.Socket as Socket exposing (Socket)
 import Phoenix.Channel as Channel
 import Phoenix.Push as Push
 import Hashids
+import Bootstrap.Button as Button
+import Bootstrap.Grid as Grid
+import Bootstrap.Grid.Col as Col
+import Bootstrap.Grid.Row as Row
+import Bootstrap.Form as Form
+import Bootstrap.Form.Input as Input
+import Bootstrap.Form.Textarea as Textarea
 
 
 type alias Model =
@@ -154,24 +161,42 @@ subscriptions model =
 view : Model -> Html Msg
 view model =
     if not model.submitted then
-        form [ onSubmit SubmitBet ]
-            [ textarea
-                [ placeholder "What are the odds that..."
-                , onInput ChangeBetText
+        Form.form [ onSubmit SubmitBet ]
+            [ Form.group []
+                [ Form.label [] [ text "Your bet:" ]
+                , Textarea.textarea
+                    [ Textarea.onInput ChangeBetText
+                    , Textarea.rows 4
+                    , Textarea.attrs
+                        [ placeholder "What are the odds that ..." ]
+                    ]
                 ]
-                []
-            , input
-                [ onInput ChangeName
-                , type_ "text"
-                , placeholder "Your name"
+            , Form.group []
+                [ Form.label [] [ text "Your name:" ]
+                , Input.text
+                    [ Input.onInput ChangeName
+                    ]
                 ]
-                []
-            , button [ type_ "submit" ] [ text "Submit" ]
+            , Button.button
+                [ Button.attrs [ type_ "submit" ]
+                , Button.primary
+                ]
+                [ text "Submit" ]
             ]
     else
-        div []
-            [ text "Tell your friend to join with this code: "
-            , b [] [ model.betText |> uniqueToken |> text ]
-            , br [] []
-            , text "Waiting for friend to join and choose odds"
+        Grid.containerFluid []
+            [ Grid.row [ Row.centerSm ]
+                [ Grid.col [ Col.middleSm ]
+                    [ p []
+                        [ text "Tell your friend to join with this code: "
+                        , b [] [ model.betText |> uniqueToken |> text ]
+                        ]
+                    ]
+                ]
+            , Grid.row [ Row.centerSm ]
+                [ Grid.col [ Col.middleSm ]
+                    [ p []
+                        [ text "Waiting for friend to join and choose odds" ]
+                    ]
+                ]
             ]

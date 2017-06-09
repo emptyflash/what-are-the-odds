@@ -11,6 +11,9 @@ import Phoenix.Push as Push
 import Json.Decode as Decoder exposing (Decoder)
 import Json.Encode as Encoder
 import Task
+import Bootstrap.Button as Button
+import Bootstrap.Form as Form
+import Bootstrap.Form.Input as Input
 
 
 type alias Model =
@@ -192,26 +195,42 @@ view : Model -> Html Msg
 view model =
     case model.joinResponse of
         Just joinResponse ->
-            form [ onSubmit SubmitOdds ]
-                [ text
-                    (joinResponse.name
-                        ++ " asked: what are the odds that "
-                        ++ joinResponse.bet
-                        ++ "?"
-                    )
-                , input
-                    [ onInput UpdateOdds
-                    , type_ "number"
-                    , placeholder "one in ..."
-                    , Html.Attributes.min "2"
+            Form.form [ onSubmit SubmitOdds ]
+                [ Form.group []
+                    [ Form.label []
+                        [ text
+                            (joinResponse.name
+                                ++ " asked: "
+                                ++ joinResponse.bet
+                                ++ "?"
+                            )
+                        ]
+                    , Input.number
+                        [ Input.onInput UpdateOdds
+                        , Input.attrs
+                            [ placeholder "one in ..."
+                            , Html.Attributes.min "2"
+                            ]
+                        ]
                     ]
-                    []
-                , button [ type_ "submit" ] [ text "Submit" ]
+                , Button.button
+                    [ Button.attrs [ type_ "submit" ]
+                    , Button.primary
+                    ]
+                    [ text "Submit" ]
                 ]
 
         Nothing ->
-            form [ onSubmit JoinChannel ]
-                [ text "Please input the code from your friend:"
-                , input [ onInput UpdateCode ] []
-                , button [ type_ "submit" ] [ text "Submit" ]
+            Form.form [ onSubmit JoinChannel ]
+                [ Form.group []
+                    [ Form.label
+                        []
+                        [ text "Please input the code from your friend:" ]
+                    , Input.text [ Input.onInput UpdateCode ]
+                    ]
+                , Button.button
+                    [ Button.attrs [ type_ "submit" ]
+                    , Button.primary
+                    ]
+                    [ text "Submit" ]
                 ]

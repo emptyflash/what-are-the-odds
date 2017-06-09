@@ -9,6 +9,10 @@ import Phoenix.Socket as Socket exposing (Socket)
 import Json.Decode as Decoder
 import Json.Encode as Encoder
 import Phoenix.Push as Push
+import Bootstrap.Button as Button
+import Bootstrap.Form as Form
+import Bootstrap.Badge as Badge
+import Bootstrap.Form.Input as Input
 
 
 type Msg
@@ -110,24 +114,32 @@ update msg model =
 
 inputGuess : Model -> Html Msg
 inputGuess model =
-    form [ onSubmit SubmitGuess ]
-        [ text
-            ("Input a number between 1 and "
-                ++ toString model.odds
-                ++ ":"
-            )
-        , input
-            [ onInput ChangeGuess
-            , type_ "number"
-            , Html.Attributes.max
-                (model.guess
-                    |> Maybe.map toString
-                    |> Maybe.withDefault ""
-                )
-            , Html.Attributes.min "1"
+    Form.form [ onSubmit SubmitGuess ]
+        [ Form.group []
+            [ Form.label []
+                [ text
+                    ("Input a number between 1 and "
+                        ++ toString model.odds
+                        ++ ":"
+                    )
+                ]
+            , Input.number
+                [ Input.onInput ChangeGuess
+                , Input.attrs
+                    [ Html.Attributes.max
+                        (model.guess
+                            |> Maybe.map toString
+                            |> Maybe.withDefault ""
+                        )
+                    , Html.Attributes.min "1"
+                    ]
+                ]
             ]
-            []
-        , button [ type_ "submit" ] [ text "Submit" ]
+        , Button.button
+            [ Button.attrs [ type_ "submit" ]
+            , Button.primary
+            ]
+            [ text "Submit" ]
         ]
 
 
@@ -141,14 +153,26 @@ view model =
             inputGuess model
 
         ( True, Nothing ) ->
-            text "waiting for friend to guess"
+            p [] [ b [] [ text "waiting for friend to guess" ] ]
 
         ( True, Just otherGuess ) ->
             let
                 guess =
                     Maybe.withDefault -1 model.guess
+
+                theirBadge =
+                    if guess == otherGuess then
+                        Badge.badgeSuccess
+                    else
+                        Badge.badgeDanger
             in
                 div []
-                    [ text ("your guess: " ++ toString guess)
-                    , text ("their guess: " ++ toString otherGuess)
+                    [ h3 []
+                        [ text "Your guess: "
+                        , Badge.badgePrimary [] [ text <| toString guess ]
+                        ]
+                    , h3 []
+                        [ text "Their guess: "
+                        , theirBadge [] [ text <| toString otherGuess ]
+                        ]
                     ]
