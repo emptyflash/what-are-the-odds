@@ -1,4 +1,4 @@
-defmodule ElmPhoenixChat.ConnCase do
+defmodule WhatAreTheOdds.ConnCase do
   @moduledoc """
   This module defines the test case to be used by
   tests that require setting up a connection.
@@ -20,10 +20,10 @@ defmodule ElmPhoenixChat.ConnCase do
       # Import conveniences for testing with connections
       use Phoenix.ConnTest
 
-      import ElmPhoenixChat.Router.Helpers
+      import WhatAreTheOdds.Router.Helpers
 
       # The default endpoint for testing
-      @endpoint ElmPhoenixChat.Endpoint
+      @endpoint WhatAreTheOdds.Endpoint
     end
   end
 

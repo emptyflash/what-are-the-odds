@@ -1,4 +1,4 @@
-defmodule ElmPhoenixChat.RoomChannel do
+defmodule WhatAreTheOdds.RoomChannel do
   use Phoenix.Channel
 
   intercept ["new:guess"]

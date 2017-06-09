@@ -1,4 +1,4 @@
-# ElmPhoenixChat
+# WhatAreTheOdds
 
 To start your Phoenix app:
 

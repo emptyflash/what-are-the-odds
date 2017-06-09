@@ -1,8 +1,8 @@
-defmodule ElmPhoenixChat.Mixfile do
+defmodule WhatAreTheOdds.Mixfile do
   use Mix.Project
 
   def project do
-    [app: :elm_phoenix_chat,
+    [app: :what_are_the_odds,
      version: "0.0.1",
      elixir: "~> 1.2",
      elixirc_paths: elixirc_paths(Mix.env),
@@ -16,7 +16,7 @@ defmodule ElmPhoenixChat.Mixfile do
   #
   # Type `mix help compile.app` for more information.
   def application do
-    [mod: {ElmPhoenixChat, []},
+    [mod: {WhatAreTheOdds, []},
      applications: [:phoenix, :phoenix_pubsub, :phoenix_html, :cowboy, :logger, :gettext]]
   end
 

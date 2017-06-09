@@ -1,5 +1,5 @@
-defmodule ElmPhoenixChat.PageControllerTest do
-  use ElmPhoenixChat.ConnCase
+defmodule WhatAreTheOdds.PageControllerTest do
+  use WhatAreTheOdds.ConnCase
 
   test "GET /", %{conn: conn} do
     conn = get conn, "/"

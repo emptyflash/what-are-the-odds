@@ -1,12 +1,12 @@
-defmodule ElmPhoenixChat.Web do
+defmodule WhatAreTheOdds.Web do
   @moduledoc """
   A module that keeps using definitions for controllers,
   views and so on.
 
   This can be used in your application as:
 
-      use ElmPhoenixChat.Web, :controller
-      use ElmPhoenixChat.Web, :view
+      use WhatAreTheOdds.Web, :controller
+      use WhatAreTheOdds.Web, :view
 
   The definitions below will be executed for every view,
   controller, etc, so keep them short and clean, focused
@@ -26,8 +26,8 @@ defmodule ElmPhoenixChat.Web do
     quote do
       use Phoenix.Controller
 
-      import ElmPhoenixChat.Router.Helpers
-      import ElmPhoenixChat.Gettext
+      import WhatAreTheOdds.Router.Helpers
+      import WhatAreTheOdds.Gettext
     end
   end
 
@@ -41,9 +41,9 @@ defmodule ElmPhoenixChat.Web do
       # Use all HTML functionality (forms, tags, etc)
       use Phoenix.HTML
 
-      import ElmPhoenixChat.Router.Helpers
-      import ElmPhoenixChat.ErrorHelpers
-      import ElmPhoenixChat.Gettext
+      import WhatAreTheOdds.Router.Helpers
+      import WhatAreTheOdds.ErrorHelpers
+      import WhatAreTheOdds.Gettext
     end
   end
 
@@ -56,7 +56,7 @@ defmodule ElmPhoenixChat.Web do
   def channel do
     quote do
       use Phoenix.Channel
-      import ElmPhoenixChat.Gettext
+      import WhatAreTheOdds.Gettext
     end
   end
 

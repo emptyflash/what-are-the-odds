@@ -1,3 +1,3 @@
-defmodule ElmPhoenixChat.LayoutView do
-  use ElmPhoenixChat.Web, :view
+defmodule WhatAreTheOdds.LayoutView do
+  use WhatAreTheOdds.Web, :view
 end

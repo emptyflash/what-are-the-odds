@@ -1,5 +1,5 @@
-defmodule ElmPhoenixChat.ErrorView do
-  use ElmPhoenixChat.Web, :view
+defmodule WhatAreTheOdds.ErrorView do
+  use WhatAreTheOdds.Web, :view
 
   def render("404.html", _assigns) do
     "Page not found"

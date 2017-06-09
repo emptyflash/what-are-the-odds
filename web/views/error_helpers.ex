@@ -1,4 +1,4 @@
-defmodule ElmPhoenixChat.ErrorHelpers do
+defmodule WhatAreTheOdds.ErrorHelpers do
   @moduledoc """
   Conveniences for translating and building error messages.
   """
@@ -32,9 +32,9 @@ defmodule ElmPhoenixChat.ErrorHelpers do
     #     dgettext "errors", "is invalid"
     #
     if count = opts[:count] do
-      Gettext.dngettext(ElmPhoenixChat.Gettext, "errors", msg, msg, count, opts)
+      Gettext.dngettext(WhatAreTheOdds.Gettext, "errors", msg, msg, count, opts)
     else
-      Gettext.dgettext(ElmPhoenixChat.Gettext, "errors", msg, opts)
+      Gettext.dgettext(WhatAreTheOdds.Gettext, "errors", msg, opts)
     end
   end
 end

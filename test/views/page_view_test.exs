@@ -1,3 +1,3 @@
-defmodule ElmPhoenixChat.PageViewTest do
-  use ElmPhoenixChat.ConnCase, async: true
+defmodule WhatAreTheOdds.PageViewTest do
+  use WhatAreTheOdds.ConnCase, async: true
 end

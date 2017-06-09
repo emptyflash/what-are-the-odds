@@ -6,7 +6,7 @@ use Mix.Config
 # The watchers configuration can be used to run external
 # watchers to your application. For example, we use it
 # with brunch.io to recompile .js and .css sources.
-config :elm_phoenix_chat, ElmPhoenixChat.Endpoint,
+config :what_are_the_odds, WhatAreTheOdds.Endpoint,
   http: [port: 4000],
   debug_errors: true,
   code_reloader: true,
@@ -16,7 +16,7 @@ config :elm_phoenix_chat, ElmPhoenixChat.Endpoint,
 
 
 # Watch static and templates for browser reloading.
-config :elm_phoenix_chat, ElmPhoenixChat.Endpoint,
+config :what_are_the_odds, WhatAreTheOdds.Endpoint,
   live_reload: [
     patterns: [
       ~r{priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$},

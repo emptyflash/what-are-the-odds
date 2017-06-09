@@ -6,11 +6,11 @@
 use Mix.Config
 
 # Configures the endpoint
-config :elm_phoenix_chat, ElmPhoenixChat.Endpoint,
+config :what_are_the_odds, WhatAreTheOdds.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "XMYqS/zpgf5KUJZaw18DYs30apVKK4SoHD7iJ3UR6+RkePWDtQxTO2QoTKTxLING",
-  render_errors: [view: ElmPhoenixChat.ErrorView, accepts: ~w(html json)],
-  pubsub: [name: ElmPhoenixChat.PubSub,
+  render_errors: [view: WhatAreTheOdds.ErrorView, accepts: ~w(html json)],
+  pubsub: [name: WhatAreTheOdds.PubSub,
            adapter: Phoenix.PubSub.PG2]
 
 # Configures Elixir's Logger

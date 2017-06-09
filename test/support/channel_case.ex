@@ -1,4 +1,4 @@
-defmodule ElmPhoenixChat.ChannelCase do
+defmodule WhatAreTheOdds.ChannelCase do
   @moduledoc """
   This module defines the test case to be used by
   channel tests.
@@ -22,7 +22,7 @@ defmodule ElmPhoenixChat.ChannelCase do
 
 
       # The default endpoint for testing
-      @endpoint ElmPhoenixChat.Endpoint
+      @endpoint WhatAreTheOdds.Endpoint
     end
   end
 

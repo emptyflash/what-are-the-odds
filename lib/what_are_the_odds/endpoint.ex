@@ -1,14 +1,14 @@
-defmodule ElmPhoenixChat.Endpoint do
-  use Phoenix.Endpoint, otp_app: :elm_phoenix_chat
+defmodule WhatAreTheOdds.Endpoint do
+  use Phoenix.Endpoint, otp_app: :what_are_the_odds
 
-  socket "/socket", ElmPhoenixChat.UserSocket
+  socket "/socket", WhatAreTheOdds.UserSocket
 
   # Serve at "/" the static files from "priv/static" directory.
   #
   # You should set gzip to true if you are running phoenix.digest
   # when deploying your static files in production.
   plug Plug.Static,
-    at: "/", from: :elm_phoenix_chat, gzip: false,
+    at: "/", from: :what_are_the_odds, gzip: false,
     only: ~w(css fonts images js favicon.ico robots.txt)
 
   # Code reloading can be explicitly enabled under the
@@ -35,8 +35,8 @@ defmodule ElmPhoenixChat.Endpoint do
   # Set :encryption_salt if you would also like to encrypt it.
   plug Plug.Session,
     store: :cookie,
-    key: "_elm_phoenix_chat_key",
+    key: "_what_are_the_odds_key",
     signing_salt: "eeuo0KP5"
 
-  plug ElmPhoenixChat.Router
+  plug WhatAreTheOdds.Router
 end

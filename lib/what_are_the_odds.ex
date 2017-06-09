@@ -1,4 +1,4 @@
-defmodule ElmPhoenixChat do
+defmodule WhatAreTheOdds do
   use Application
   require Registry
 
@@ -10,22 +10,22 @@ defmodule ElmPhoenixChat do
     # Define workers and child supervisors to be supervised
     children = [
       # Start the endpoint when the application starts
-      supervisor(ElmPhoenixChat.Endpoint, []),
-      # Start your own worker by calling: ElmPhoenixChat.Worker.start_link(arg1, arg2, arg3)
-      # worker(ElmPhoenixChat.Worker, [arg1, arg2, arg3]),
+      supervisor(WhatAreTheOdds.Endpoint, []),
+      # Start your own worker by calling: WhatAreTheOdds.Worker.start_link(arg1, arg2, arg3)
+      # worker(WhatAreTheOdds.Worker, [arg1, arg2, arg3]),
       supervisor(Registry, [:unique, Registry.BetState])
     ]
 
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html
     # for other strategies and supported options
-    opts = [strategy: :one_for_one, name: ElmPhoenixChat.Supervisor]
+    opts = [strategy: :one_for_one, name: WhatAreTheOdds.Supervisor]
     Supervisor.start_link(children, opts)
   end
 
   # Tell Phoenix to update the endpoint configuration
   # whenever the application is updated.
   def config_change(changed, _new, removed) do
-    ElmPhoenixChat.Endpoint.config_change(changed, removed)
+    WhatAreTheOdds.Endpoint.config_change(changed, removed)
     :ok
   end
 end

@@ -1,5 +1,5 @@
-defmodule ElmPhoenixChat.Router do
-  use ElmPhoenixChat.Web, :router
+defmodule WhatAreTheOdds.Router do
+  use WhatAreTheOdds.Web, :router
 
   pipeline :browser do
     plug :accepts, ["html"]
@@ -13,14 +13,14 @@ defmodule ElmPhoenixChat.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/", ElmPhoenixChat do
+  scope "/", WhatAreTheOdds do
     pipe_through :browser # Use the default browser stack
 
     get "/", PageController, :index
   end
 
   # Other scopes may use custom stacks.
-  # scope "/api", ElmPhoenixChat do
+  # scope "/api", WhatAreTheOdds do
   #   pipe_through :api
   # end
 end

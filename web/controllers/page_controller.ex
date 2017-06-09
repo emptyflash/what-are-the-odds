@@ -1,5 +1,5 @@
-defmodule ElmPhoenixChat.PageController do
-  use ElmPhoenixChat.Web, :controller
+defmodule WhatAreTheOdds.PageController do
+  use WhatAreTheOdds.Web, :controller
 
   def index(conn, _params) do
     render conn, "index.html"
