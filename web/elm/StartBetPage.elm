@@ -167,8 +167,7 @@ view model =
                 , Textarea.textarea
                     [ Textarea.onInput ChangeBetText
                     , Textarea.rows 4
-                    , Textarea.attrs
-                        [ placeholder "What are the odds that ..." ]
+                    , Textarea.defaultValue "what are the odds that "
                     ]
                 ]
             , Form.group []
