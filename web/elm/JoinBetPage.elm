@@ -21,6 +21,7 @@ type alias Model =
     , socket : Socket Msg
     , joinResponse : Maybe JoinResponse
     , odds : Int
+    , lastError : Maybe JoinError
     }
 
 
@@ -42,11 +43,22 @@ type alias JoinResponse =
     }
 
 
+type alias JoinError =
+    { reason : String
+    }
+
+
 decodeJoin : Decoder JoinResponse
 decodeJoin =
     Decoder.map2 JoinResponse
         (Decoder.field "bet" Decoder.string)
         (Decoder.field "name" Decoder.string)
+
+
+decodeError : Decoder JoinError
+decodeError =
+    Decoder.map JoinError
+        (Decoder.field "reason" Decoder.string)
 
 
 init : Route msg -> ( Model, Cmd Msg )
@@ -56,6 +68,7 @@ init route =
             { socket = initSocket
             , code = Nothing
             , joinResponse = Nothing
+            , lastError = Nothing
             , odds = -1
             }
 
@@ -94,7 +107,7 @@ joinChannel model code =
         channel =
             Channel.init (channelName code)
                 |> Channel.onJoin ChannelJoined
-                |> Channel.onError ChannelError
+                |> Channel.onJoinError ChannelError
 
         ( newSocket, cmd ) =
             Socket.join channel model.socket
@@ -187,8 +200,64 @@ update msg model =
                 Nothing ->
                     ( model, Cmd.none )
 
+        ChannelError json ->
+            let
+                joinError =
+                    json
+                        |> Decoder.decodeValue decodeError
+                        |> Result.toMaybe
+            in
+                ( { model | lastError = joinError }, Cmd.none )
+
         _ ->
             ( model, Cmd.none )
+
+
+codeInput : Maybe JoinError -> Html Msg
+codeInput maybeError =
+    let
+        inputId =
+            "codeInput"
+
+        label =
+            Form.label [ Html.Attributes.for inputId ]
+                [ text "Please input the code from your friend:" ]
+
+        input =
+            Input.text [ Input.onInput UpdateCode, Input.id inputId ]
+    in
+        case maybeError of
+            Just error ->
+                Form.group [ Form.groupDanger ]
+                    [ label
+                    , input
+                    , Form.validationText []
+                        [ text <| "Error: " ++ error.reason ]
+                    ]
+
+            Nothing ->
+                Form.group [] [ label, input ]
+
+
+oddsInput : JoinResponse -> Html Msg
+oddsInput joinResponse =
+    Form.group []
+        [ Form.label []
+            [ text
+                (joinResponse.name
+                    ++ " asked: "
+                    ++ joinResponse.bet
+                    ++ "?"
+                )
+            ]
+        , Input.number
+            [ Input.onInput UpdateOdds
+            , Input.attrs
+                [ placeholder "one in ..."
+                , Html.Attributes.min "2"
+                ]
+            ]
+        ]
 
 
 view : Model -> Html Msg
@@ -196,23 +265,7 @@ view model =
     case model.joinResponse of
         Just joinResponse ->
             Form.form [ onSubmit SubmitOdds ]
-                [ Form.group []
-                    [ Form.label []
-                        [ text
-                            (joinResponse.name
-                                ++ " asked: "
-                                ++ joinResponse.bet
-                                ++ "?"
-                            )
-                        ]
-                    , Input.number
-                        [ Input.onInput UpdateOdds
-                        , Input.attrs
-                            [ placeholder "one in ..."
-                            , Html.Attributes.min "2"
-                            ]
-                        ]
-                    ]
+                [ oddsInput joinResponse
                 , Button.button
                     [ Button.attrs [ type_ "submit" ]
                     , Button.primary
@@ -222,12 +275,7 @@ view model =
 
         Nothing ->
             Form.form [ onSubmit JoinChannel ]
-                [ Form.group []
-                    [ Form.label
-                        []
-                        [ text "Please input the code from your friend:" ]
-                    , Input.text [ Input.onInput UpdateCode ]
-                    ]
+                [ codeInput model.lastError
                 , Button.button
                     [ Button.attrs [ type_ "submit" ]
                     , Button.primary

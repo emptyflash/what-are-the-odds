@@ -25,9 +25,16 @@ defmodule WhatAreTheOdds.RoomChannel do
   def join("bet:join:" <> code, _params, socket) do
     agent_name = get_agent_name(code)
     try do
-      Agent.get(agent_name, fn %{bet: bet, name: name} ->
-        {:ok, %{bet: bet, name: name}, socket}
+      closed = Agent.get(agent_name, &Map.get(&1, :closed, false))
+      bet_and_name = Agent.get(agent_name, fn %{bet: bet, name: name} ->
+        %{bet: bet, name: name}
       end)
+      if closed do
+        {:error, %{reason: "This bet has already been joined"}}
+      else
+        Agent.update(agent_name, &Map.put(&1, :closed, true))
+        {:ok, bet_and_name, socket}
+      end
     catch
       :exit, _ -> {:error, %{reason: "This bet does not exist"}}
     end
