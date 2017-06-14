@@ -125,6 +125,7 @@ inputGuess model =
                 ]
             , Input.number
                 [ Input.onInput ChangeGuess
+                , Input.defaultValue "1"
                 , Input.attrs
                     [ Html.Attributes.max
                         (model.guess

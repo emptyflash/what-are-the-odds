@@ -202,8 +202,7 @@ updatePage pageMsg model =
 view : Model -> Html Msg
 view model =
     Grid.container []
-        [ CDN.stylesheet
-        , h1 [] [ text "What Are the Odds?" ]
+        [ h1 [] [ text "What Are the Odds?" ]
         , viewPage model
         ]
 

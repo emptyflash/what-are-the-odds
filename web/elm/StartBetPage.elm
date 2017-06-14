@@ -167,7 +167,7 @@ view model =
                 , Textarea.textarea
                     [ Textarea.onInput ChangeBetText
                     , Textarea.rows 4
-                    , Textarea.defaultValue "what are the odds that "
+                    , Textarea.defaultValue "What are the odds that "
                     ]
                 ]
             , Form.group []
@@ -183,7 +183,7 @@ view model =
                 [ text "Submit" ]
             ]
     else
-        Grid.containerFluid []
+        Grid.container []
             [ Grid.row [ Row.centerSm ]
                 [ Grid.col [ Col.middleSm ]
                     [ p []

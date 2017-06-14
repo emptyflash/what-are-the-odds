@@ -231,7 +231,7 @@ codeInput maybeError =
                 Form.group [ Form.groupDanger ]
                     [ label
                     , input
-                    , Form.validationText []
+                    , p []
                         [ text <| "Error: " ++ error.reason ]
                     ]
 
