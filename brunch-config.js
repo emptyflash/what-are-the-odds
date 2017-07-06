@@ -59,7 +59,7 @@ exports.config = {
     elmBrunch: {
       elmFolder: "web/elm",
       mainModules: ["Main.elm"],
-      outputFolder: "../priv/static/js"
+      outputFolder: "../web/static/js"
     }
   },
 
